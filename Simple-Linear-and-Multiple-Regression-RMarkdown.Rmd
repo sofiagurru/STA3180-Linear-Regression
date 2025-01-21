@@ -1,0 +1,94 @@
+---
+title: "Simple-Linear-and-Multiple-Regression-RMarkdown"
+author: "Sofia Gurruchaga"
+date: "2024-09-6"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+1. 
+```{r}
+library(ggplot2)
+library(MASS)
+hikes<-read.csv("~/Downloads/Hikes Data.csv")
+```
+```{r}
+cor_matrix <- cor(hikes[, c('Time', 'Elevation', 'Ascent', 'Difficulty', 'Length')])
+print(cor_matrix)
+```
+
+
+```{r}
+ggplot(hikes, aes(x = Elevation, y = Time)) +
+  geom_point() +
+  geom_smooth(method = 'lm', col = 'blue') +
+  labs(title = "Time vs Elevation", x = "Elevation (feet)", y = "Time (hours)")
+```
+```{r}
+ggplot(hikes, aes(x = Ascent, y = Time)) +
+  geom_point() +
+  geom_smooth(method = 'lm', col = 'blue') +
+  labs(title = "Time vs Ascent", x = "Ascent (feet)", y = "Time (hours)")
+```
+```{r}
+ggplot(hikes, aes(x = Difficulty, y = Time)) +
+  geom_point() +
+  geom_smooth(method = 'lm', col = 'blue') +
+  labs(title = "Time vs Difficulty", x = "Difficulty (1-7 scale)", y = "Time (hours)")
+```
+```{r}
+ggplot(hikes, aes(x = Length, y = Time)) +
+  geom_point() +
+  geom_smooth(method = 'lm', col = 'blue') +
+  labs(title = "Time vs Length", x = "Length (miles)", y = "Time (hours)")
+```
+2. 
+```{r}
+slrmodel <- lm(Time ~ Length, data = hikes)
+summary(slrmodel)
+```
+4. 
+```{r}
+r_value <- cor(hikes$Time, hikes$Length)
+r_squared <- summary(slrmodel)$r.squared
+```
+5. 
+```{r}
+qqnorm(residuals(slrmodel))
+qqline(residuals(slrmodel))
+```
+6. 
+```{r}
+plot(fitted(slrmodel), residuals(slrmodel), 
+     xlab = "Fitted Values", ylab = "Residuals",
+     main = "Residuals vs Fitted Values")
+abline(h = 0, col = "red")
+```
+8. 
+```{r}
+low_difficulty <- subset(hikes, Difficulty <= 4)
+high_difficulty <- subset(hikes, Difficulty > 4)
+
+model_low <- lm(Time ~ Elevation + Ascent + Length, data = low_difficulty)
+summary(model_low)
+
+model_high <- lm(Time ~ Elevation + Ascent + Length, data = high_difficulty)
+summary(model_high)
+```
+11. 
+```{r}
+full_model_low <- lm(Time ~ Elevation + Ascent + Length, data = low_difficulty)
+best_model_low <- step(full_model_low, direction = "both")
+summary(best_model_low)
+```
+```{r}
+full_model_high <- lm(Time ~ Elevation + Ascent + Length, data = high_difficulty)
+best_model_high <- step(full_model_high, direction = "both")
+summary(best_model_high)
+```
+
+
